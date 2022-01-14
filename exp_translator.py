@@ -5,6 +5,7 @@ Lark Parser Generator
 REPL calculator shows how to write a basic calculator with variables.
 """
 from lark import Lark, Transformer, v_args
+import os
 
 calc_grammar = """
     ?start: sum             -> ret
@@ -66,7 +67,7 @@ class AsmTree(Transformer):
         self.instr.append("const " + x + "\n")
 
     def neg(self, right):
-        self.instr.append("const " + right + "\nconst 0\n")
+        self.instr.append("const 0\nconst " + right + "\n")
         self.instr.append("call Int:sub\n")
 
 
@@ -82,9 +83,13 @@ def main():
     while instr_set:
         f.write(instr_set.pop(0))
 
-    f.write("call Int:print\npop\nreturn 0")
+    newline_clause = 'const "\\n"\ncall  String:print\npop\n'
+    eq_clause = 'const "' + s + ' = "\ncall String:print\npop\n'
+    end_clause = eq_clause + 'call Int:print\npop\n'+newline_clause+'const "Operation Done"\ncall String:print\npop\nreturn 0'
+    f.write(end_clause)
     f.close()
 
 
 if __name__ == '__main__':
     main()
+    os.system('python assemble.py unit_tests/sample.asm sample.json')

@@ -631,7 +631,7 @@ obj_ref native_Int_sub(void ) {
     obj_Int other_int = (obj_Int) other;
     log_debug("Subtracting integer values: %d - %d",
               this_int->value, other_int->value);
-    obj_ref sub = new_int(this_int->value - other_int->value);
+    obj_ref sub = new_int(other_int->value - this_int->value);
     return sub;
 }
 
@@ -676,7 +676,7 @@ obj_ref native_Int_div(void ) {
     if (other_int->value != 0) {
         log_debug("Multiplying integer values: %d / %d",
                   this_int->value, other_int->value);
-        obj_ref div = new_int(this_int->value / other_int->value);
+        obj_ref div = new_int(other_int->value / this_int->value);
         return div;
     }
 }
