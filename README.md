@@ -9,6 +9,6 @@ if I can ready it in time.
 
 ## How to use asm_generator
 
-Simply run "python asm_generator"
-Then run "python assemble.py unit_tests/sample.asm sample.json"
+Simply run "python asm_generator"\n
+Then run "python assemble.py unit_tests/sample.asm sample.json"\n
 If you have tiny_vm, then run it at last.
