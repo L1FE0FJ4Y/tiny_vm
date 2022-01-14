@@ -7,3 +7,8 @@ This is intended to become the core of an interpreter for the Winter 2022
 offering of CIS 461/561 compiler construction course at University of Oregon, 
 if I can ready it in time. 
 
+## How to use asm_generator
+
+Simply run "python asm_generator"
+Then run "python assemble.py unit_tests/sample.asm sample.json"
+If you have tiny_vm, then run it at last.
