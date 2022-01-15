@@ -1,20 +1,16 @@
 .class Sample:Obj
 
 .method $constructor
-const 0
-const 5
-call Int:sub
-const 5
-call Int:sub
 const 10
-call Int:div
+const 5
+call Int:plus
 const 0
-const 2
+const 1
 call Int:sub
 call Int:mult
-const 20
-call Int:plus
-const "(((-5-5)/10)*-2)+20 = "
+const 4
+call Int:mult
+const "-(10+5)*4 = "
 call String:print
 pop
 call Int:print

@@ -20,7 +20,7 @@ calc_grammar = """
         | product "/" atom  -> div
 
     ?atom: NUMBER           -> number
-         | "-" NUMBER       -> neg
+         | "-" atom         -> neg
          | NAME             -> var
          | "(" sum ")"
     
@@ -37,6 +37,9 @@ class AsmTree(Transformer):
     def __init__(self):
         self.vars = {}
         self.instr = []
+        self.neg_flag = 0
+        self.eq_flag = 0
+        self.num_flag = 0
 
     def assign_var(self, name, value):
         self.vars[name] = value
@@ -67,8 +70,10 @@ class AsmTree(Transformer):
         self.instr.append("const " + x + "\n")
 
     def neg(self, right):
-        self.instr.append("const 0\nconst " + right + "\n")
+        self.instr.append("const 0\n")
+        self.instr.append("const 1\n")
         self.instr.append("call Int:sub\n")
+        self.instr.append("call Int:mult\n")
 
 
 def main():
