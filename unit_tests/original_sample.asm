@@ -1,8 +1,13 @@
 # Sample assembly code
 # (augment as the assember and loader are built out)
 .class Sample:Obj
+.field x   # This is in addition to inherited fields
+.field y
+.method added forward
 
 .method $constructor
+    enter
+    call $:added
     const "Scrabble: The game\n"
     call  String:print
     pop
@@ -20,6 +25,6 @@
     return 0
 
 .method added
-    const "I added a method!\n"
+    load_field $:x
+    store_field $:y
     return 0
-
