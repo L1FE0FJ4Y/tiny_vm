@@ -1,0 +1,11 @@
+i: Int = -(84 + 16) * 1;
+j: Int = i + 23;
+k: Int = -(j - i) + 23 + 2 * 9;
+k.print();
+"\n".print();
+cat: String = "Nora";
+other: String = " can solve puzzles";
+(cat + other).print();
+"\n".print();
+cat.string().print();
+"\n".print();

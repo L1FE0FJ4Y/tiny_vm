@@ -314,6 +314,27 @@ vm_Word method_String_equals[] = {
         {.intval = 1}  // consume other
 };
 
+/* String:plus  */
+obj_ref native_String_plus(void ) {
+    obj_ref this = vm_fp->obj;
+    assert_is_type(this, the_class_String);
+    obj_String this_str = (obj_String) this;
+    obj_ref other = (vm_fp - 1)->obj;
+    assert_is_type(other, the_class_String);
+    obj_String other_str = (obj_String) other;
+    char *s = (char *)malloc(sizeof(char)*255);
+    strcat(s, this_str->text);
+    strcat(s, other_str->text);
+    return new_string(s);
+}
+
+vm_Word method_String_plus[] = {
+        {.instr = vm_op_enter},
+        {.instr = vm_op_call_native},
+        {.native = native_String_plus},
+        {.instr = vm_op_return},
+        {.intval = 1}
+};
 
 /* The String Class (a singleton) */
 struct  class_struct  the_class_String_struct = {
@@ -325,7 +346,9 @@ struct  class_struct  the_class_String_struct = {
         method_String_constructor,     /* Constructor */
         method_String_string,
         method_String_print,
-        method_String_equals
+        method_String_equals,
+        method_tbd_1, //tbd for less
+        method_String_plus
 };
 
 class_ref the_class_String = &the_class_String_struct;
@@ -642,7 +665,7 @@ obj_ref native_Int_sub(void ) {
     obj_Int other_int = (obj_Int) other;
     log_debug("Subtracting integer values: %d - %d",
               this_int->value, other_int->value);
-    obj_ref sub = new_int(other_int->value - this_int->value);
+    obj_ref sub = new_int(this_int->value - other_int->value);
     return sub;
 }
 
@@ -687,7 +710,7 @@ obj_ref native_Int_div(void ) {
     if (other_int->value != 0) {
         log_debug("Multiplying integer values: %d / %d",
                   this_int->value, other_int->value);
-        obj_ref div = new_int(other_int->value / this_int->value);
+        obj_ref div = new_int(this_int->value / other_int->value);
         return div;
     }
 }
