@@ -9,8 +9,8 @@ if I can ready it in time.
 
 ## How to use asm_generator
 
-Simply run "python exp_translator" (abbreviation of "expression translator" <br />
-Then type any integer operation that you would like to calculate.<br />
-ex)     > -(10+5)*4 <br />
-Then the program automatically generate .asm file and translate into .json file. <br />
-Lastly, run the tiny_vm, then it will present result of expression that you entered.
+Insert any calls that you want to try in the "quack.txt" <br />
+Simply run "python quack_quack.py < quack.txt" <br />
+
+Then the program automatically generate Quack.asm file and translate into Quack.json file. <br />
+Lastly, it runs Ori_VM with the Quack.json file, and present result of the quack.txt.
