@@ -51,7 +51,7 @@ quack_grammar = """
         | method
     
     l_exp: NAME -> load
-         | ESCAPED_STRING -> const
+         | ESCAPED_STRING -> str
          
     ?calc: product
         | calc "+" product   -> plus
@@ -74,43 +74,48 @@ quack_grammar = """
     %ignore WS
 """
 
+#Queue for reversing the order
 call_q = []
+#Number of return (length of field dic)
 num_ret = 0
+#List of Types
+types = ["Bool","Int","Nothing","Obj","String"]
+#Global tables
+field_dic = {}
+arg_dic = {}
+local_dic = {}
+pop_list = ["print"]
+logics = ["plus", "sub", "mult", "div"]
 
 @v_args(inline=True)    # Affects the signatures of the methods
 class Set(visitors.Visitor_Recursive):
 
-    def __init__(self):
-        self.field_dic = {}
-        self.arg_dic = {}
-        self.local_dic = {}
-
     def __default__(self, tree):
         if tree.data == "assignment":
             key, value = tree.children[0].children[0], tree.children[1].children[0]
-            self.local_dic[key] = value
+            local_dic[key] = value
 
     def exec(self, tree):
-        if len(self.field_dic) > 0:
-            num_ret = len(self.field_dic)
+        if len(field_dic) > 0:
+            num_ret = len(field_dic)
             call = ".field "
-            for count,field in enumerate(self.field_dic):
+            for count,field in enumerate(field_dic):
                 if count == 0:
                     call += field[0]
                 else:
                     call += "," + field[0]
             call_q.append(call)
-        elif len(self.arg_dic) > 0:
+        elif len(arg_dic) > 0:
             call = ".args "
-            for count,field in enumerate(self.arg_dic):
+            for count,field in enumerate(arg_dic):
                 if count == 0:
                     call += field[0]
                 else:
                     call += "," + field[0]
             call_q.append(call)
-        elif len(self.local_dic) > 0:
+        elif len(local_dic) > 0:
             call = ".local "
-            for count,field in enumerate(self.local_dic):
+            for count,field in enumerate(local_dic):
                 if count == 0:
                     call += field
                 else:
@@ -119,42 +124,29 @@ class Set(visitors.Visitor_Recursive):
 
 
 class Convert(visitors.Visitor_Recursive):
-    def __init__(self):
-        self.field_dic = {}
-        self.arg_dic = {}
-        self.local_dic = {}
 
     def __default__(self, tree):
         if tree.data == "const" :
             self.cur_type = "Int"
+        if tree.data == "str" :
+            self.cur_type = "String"
+            tree.data = "const"
 
         if tree.data == "load" :
-            if tree.children[0] in self.field_dic:
-                self.cur_type = self.field_dic[tree.children[0]]
-            elif tree.children[0] in self.arg_dic:
-                self.cur_type = self.arg_dic[tree.children[0]]
-            elif tree.children[0] in self.local_dic:
-                self.cur_type = self.local_dic[tree.children[0]]
+            if tree.children[0] in field_dic:
+                self.cur_type = field_dic[tree.children[0]]
+            elif tree.children[0] in arg_dic:
+                self.cur_type = arg_dic[tree.children[0]]
+            elif tree.children[0] in local_dic:
+                self.cur_type = local_dic[tree.children[0]]
 
-        elif tree.data == "plus":
-            tree.data = "call " + self.cur_type + ":" + tree.data
-
-        elif tree.data == "sub":
-            tree.data = "call " + self.cur_type + ":" + tree.data
-
-        elif tree.data == "mult":
-            tree.data = "call " + self.cur_type + ":" + tree.data
-
-        elif tree.data == "div":
-            tree.data = "call " + self.cur_type + ":" + tree.data
+        elif tree.data == "statement":
+            tree.data = self.cur_type
 
         elif tree.data == "assignment":
-            self.local_dic[tree.children[0].children[0]] = tree.children[1].children[0]
+            local_dic[tree.children[0].children[0]] = tree.children[1].children[0]
             tree.children[0].data = "store"
-            self.cur_type = tree.children[1].children[0]
 
-        elif tree.data == "method":
-            tree.children[1] = "call " + self.cur_type + ":" + tree.children[1] + "\npop"
 
 
 class Store(visitors.Visitor_Recursive):
@@ -162,26 +154,35 @@ class Store(visitors.Visitor_Recursive):
         self.que = []
 
     def __default__(self, tree):
-        def traverse():
-            for subtree in tree.iter_subtrees_topdown():
+        def traverse(tr):
+            for subtree in tr.iter_subtrees_topdown():
                 if subtree.data == "load" or  subtree.data == "store" or subtree.data == "const":
                     call = subtree.data + " " + subtree.children[0]
                     self.que.append(call)
                 elif subtree.data == "neg":
                     self.que.append("call Int:sub")
                     self.que.append("const 0")
-                elif "call" in subtree.data:
-                    call = subtree.data
+                elif subtree.data in logics:
+                    call = "call " + tr.data + ":" + subtree.data
                     self.que.append(call)
+                elif subtree.data == "method":
+                    new_call = "call " + tr.data + ":" + subtree.children[0]
+                    if subtree.children[0] in pop_list:
+                        subtree.children[0] = new_call + "\npop"
+                    else:
+                        subtree.children[0] = new_call
+                    self.que.append(new_call)
+
             while len(self.que):
                 call_q.append(self.que.pop())
 
-        if tree.data == "assignment":
-            traverse()
-        elif tree.data == "method":
-            self.que.append(tree.children[1])
-            traverse()
+        if tree.data == "method":
+            temp_obj = tree.children[0]
+            tree.children[0] = tree.children[1]
+            tree.children[1] = temp_obj
 
+        elif tree.data in types:
+            traverse(tree)
 
 
 def main():
@@ -196,7 +197,9 @@ def main():
     sample = quack(code)
     Set().visit(sample)
     sample = Convert().visit(sample)
+    print(sample.pretty())
     Store().visit(sample)
+    print("\n\n", sample.pretty())
 
     f = open("./Quack.asm", "w")
     while call_q:
