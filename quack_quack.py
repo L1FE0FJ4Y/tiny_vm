@@ -196,10 +196,9 @@ def main():
 
     sample = quack(code)
     Set().visit(sample)
-    sample = Convert().visit(sample)
-    print(sample.pretty())
+    Convert().visit(sample)
     Store().visit(sample)
-    print("\n\n", sample.pretty())
+
 
     f = open("./Quack.asm", "w")
     while call_q:
