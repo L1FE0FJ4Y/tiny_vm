@@ -4,33 +4,9 @@ Lark Parser Generator
 
 REPL calculator shows how to write a basic calculator with variables.
 """
-from lark import Lark, Transformer, v_args, visitors
+from lark import Lark, Token, Transformer, v_args, visitors
 import sys
 import os
-
-calc_grammar = """
-    ?start: sum             -> ret
-          | NAME "=" sum    -> assign_var
-
-    ?sum: product
-        | sum "+" product   -> add
-        | sum "-" product   -> sub
-
-    ?product: atom
-        | product "*" atom  -> mult
-        | product "/" atom  -> div
-
-    ?atom: NUMBER           -> number
-         | "-" atom         -> neg
-         | NAME             -> var
-         | "(" sum ")"
-    
-    %import common.CNAME -> NAME
-    %import common.NUMBER
-    %import common.WS_INLINE
-
-    %ignore WS_INLINE
-"""
 
 quack_grammar = """
     ?start: program -> exec
@@ -51,7 +27,6 @@ quack_grammar = """
         | method
     
     l_exp: NAME -> load
-         | ESCAPED_STRING -> str
          
     ?calc: product
         | calc "+" product   -> plus
@@ -62,10 +37,18 @@ quack_grammar = """
         | product "/" atom  -> div
 
     ?atom: NUMBER           -> const
-         | "-" atom         -> neg
-         | l_exp
-         | "(" calc ")"
+        | "-" atom         -> neg
+        | l_exp
+        | "(" calc ")"
+        | nothing   
+        | boolean   
+        | ESCAPED_STRING -> string
+        
+    ?nothing: "none"   -> lit_not
     
+    ?boolean: "true" -> lit_true
+        |   "false" -> lit_false
+        
     %import common.ESCAPED_STRING
     %import common.CNAME -> NAME
     %import common.NUMBER
@@ -128,11 +111,20 @@ class Convert(visitors.Visitor_Recursive):
     def __default__(self, tree):
         if tree.data == "const" :
             self.cur_type = "Int"
-        if tree.data == "str" :
+        elif tree.data == "string" :
             self.cur_type = "String"
             tree.data = "const"
+        elif tree.data == "lit_not" :
+            self.cur_type = "Nothing"
+            tree.data = "const nothing"
+        elif tree.data == "lit_true" :
+            self.cur_type = "Bool"
+            tree.data = "const true"
+        elif tree.data == "lit_false" :
+            self.cur_type = "Bool"
+            tree.data = "const false"
 
-        if tree.data == "load" :
+        elif tree.data == "load" :
             if tree.children[0] in field_dic:
                 self.cur_type = field_dic[tree.children[0]]
             elif tree.children[0] in arg_dic:
@@ -148,7 +140,6 @@ class Convert(visitors.Visitor_Recursive):
             tree.children[0].data = "store"
 
 
-
 class Store(visitors.Visitor_Recursive):
     def __init__(self):
         self.que = []
@@ -159,6 +150,8 @@ class Store(visitors.Visitor_Recursive):
                 if subtree.data == "load" or  subtree.data == "store" or subtree.data == "const":
                     call = subtree.data + " " + subtree.children[0]
                     self.que.append(call)
+                elif "const " in subtree.data:
+                    self.que.append(subtree.data)
                 elif subtree.data == "neg":
                     self.que.append("call Int:sub")
                     self.que.append("const 0")
@@ -168,9 +161,7 @@ class Store(visitors.Visitor_Recursive):
                 elif subtree.data == "method":
                     new_call = "call " + tr.data + ":" + subtree.children[0]
                     if subtree.children[0] in pop_list:
-                        subtree.children[0] = new_call + "\npop"
-                    else:
-                        subtree.children[0] = new_call
+                        new_call += "\npop"
                     self.que.append(new_call)
 
             while len(self.que):
@@ -197,6 +188,7 @@ def main():
     sample = quack(code)
     Set().visit(sample)
     Convert().visit(sample)
+    print(sample.pretty())
     Store().visit(sample)
 
 
