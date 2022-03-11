@@ -35,4 +35,5 @@ After succesful execution, it will return a asembly file called "Quack.asm"
 - Work after type checking is not implemented yet
 
 #Future Work
+- Since full quack is not yet implemented, script for running the Quack is not yet set up
 - Once the Type Checking is done, the compiler can compile any Quack languages
