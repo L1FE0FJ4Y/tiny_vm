@@ -80,7 +80,7 @@ class ClassNode(ASTNode):
                  super_class: str,
                  block: List[ASTNode],
                  methods: List[ASTNode]):
-        self.name = name
+        self.name = str(name)
         self.formals = formals
         self.super_class = super_class
         self.methods = methods
@@ -105,7 +105,7 @@ class ClassNode(ASTNode):
             "fields": { f"{fm.var_type}" for fm in flatten([self.formals])},
             "methods": {}
         }
-        visit_state["current_class"] = str(self.name)
+        visit_state["current_class"] = self.name
         visit_state["fields"] = set()
         for fm in flatten([self.formals]):
             visit_state["fields"].add(str(fm))
@@ -520,17 +520,14 @@ class ASTBuilder(Transformer):
         return AsmtNode(left, ident, right)
 
     def new(self, e):
-        ident, args = e
-        return NewNode(ident,args)
+        return NewNode(e[0],e[1:-1])
 
     def method_call(self, e):
         '''r_exp "." ident "(" args* ")" ->method_call'''
         if len(e) == 2:
-            right, ident = e
-            args = []
+            return MethodCallNode(e[0], e[1], [])
         else:
-            right, ident, args = e
-        return MethodCallNode(ident, right, args)
+            return MethodCallNode(e[0], e[1], e[2:-1])
 
     def args(self, e):
         value = e[0]
@@ -637,15 +634,15 @@ class ASTBuilder(Transformer):
 
     def lit_not(self, e):
         type = 'Nothing'
-        return VarNode(e[0].value, type)
+        return VarNode("nothing", type)
 
     def lit_true(self, e):
         type = 'Bool'
-        return VarNode(e[0].value, type)
+        return VarNode("true", type)
 
     def lit_false(self, e):
         type = 'Bool'
-        return VarNode(e[0].value, type)
+        return VarNode("false", type)
 
     def returns(self, e):
         return ReturnNode(e)

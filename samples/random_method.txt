@@ -1,0 +1,20 @@
+def not_duck_typing(x: Int): Int {
+  if x >= 7 {
+    a = 42;
+    b = 13;
+  } else {
+     a = "forty-two";
+     b = "thirteen";
+  }
+  if a < b {
+       return 1;
+    } else {
+       return 2;
+  }
+}
+
+halo = 1;
+while halo > 0 {
+    halo.print();
+    halo = halo - 1;
+}
