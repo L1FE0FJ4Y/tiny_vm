@@ -1,5 +1,5 @@
-# tiny_vm
-A tiny virtual machine interpreter for Quack programs
+# Quack
+A compiler for an object-oriented programming language Quack.
 
 ## Work in progress
 
@@ -9,8 +9,22 @@ if I can ready it in time.
 
 ## How to use asm_generator
 
-Insert any calls that you want to try in the "quack.txt" <br />
-Simply run "python quack_quack.py < quack.txt" <br />
+Type code in text file and run following command with corresponding text file name
 
-Then the program automatically generate Quack.asm file and translate into Quack.json file. <br />
-Lastly, it runs Ori_VM with the Quack.json file, and present result of the quack.txt.
+```
+python3 compile.py < any.txt
+```
+After succesful execution, it will return a asembly file called "Quack.asm"
+
+## Progress
+
+#Finished Tasks
+- Grammar is finished
+- AST tree generation is completed
+- Initialization is completed
+
+#Need to be fixed
+- Type Checking is still not yet modified
+
+#Future Work
+- Once the Type Checking is done, the compiler can compile any Quack languages
