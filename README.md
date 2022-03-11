@@ -14,6 +14,10 @@ Type code in text file and run following command with corresponding text file na
 ```
 python3 compile.py < any.txt
 ```
+Running samples :
+```
+python3 compile.py < ./samples/any.txt
+```
 After succesful execution, it will return a asembly file called "Quack.asm"
 
 ## Progress
@@ -23,8 +27,12 @@ After succesful execution, it will return a asembly file called "Quack.asm"
 - AST tree generation is completed
 - Initialization is completed
 
+#Samples
+-Used test samples are in samples directory
+
 #Need to be fixed
 - Type Checking is still not yet modified
+- Work after type checking is not implemented yet
 
 #Future Work
 - Once the Type Checking is done, the compiler can compile any Quack languages
