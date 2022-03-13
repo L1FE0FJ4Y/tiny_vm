@@ -26,18 +26,18 @@ This file contains grammar for Quack and JSON object which stores types and vari
 
 ## Progress
 
-#Finished Tasks
+# Finished Tasks
 - Grammar is finished
 - AST tree generation is completed
 - Initialization is completed
 
-#Samples
+# Samples
 -Used test samples are in samples directory
 
-#Need to be fixed
+# Need to be fixed
 - Type Checking is still not yet modified
 - Work after type checking is not implemented yet
 
-#Future Work
+# Future Work
 - Since full quack is not yet implemented, script for running the Quack is not yet set up
 - Once the Type Checking is done, the compiler can compile any Quack languages
