@@ -21,7 +21,7 @@ python3 compile.py < ./samples/any.txt
 After succesful execution, it will return a asembly file called "Quack.asm"
 Since this does not contain type checking, generated code does not show corresponding types for the operation
 
-##Orilib
+# Orilib
 This file contains grammar for Quack and JSON object which stores types and variables
 
 ## Progress
