@@ -1,5 +1,5 @@
 # Quack
-A compiler for an object-oriented programming language Quack.
+A interpreter for an object-oriented programming language Quack.
 
 ## Work in progress
 
